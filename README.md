@@ -1,6 +1,8 @@
 ## Official source code of the "BSP-OT: Sparse transport plans between discrete measures in loglinear time" paper (SIGGRAPH Asia 2025). 
 Baptiste Genest, Nicolas Bonneel, Vincent Nivoliers, David Coeurjolly.
 
+![teaser](https://github.com/baptiste-genest/BSP-OT/blob/main/teaser.jpg)
+
 # BSP-OT Compilation Guide
 
 This guide explains how to compile the BSPOT project using CMake, focusing on the top-level `CMakeLists.txt`. It also lists all dependencies and how to obtain them.
