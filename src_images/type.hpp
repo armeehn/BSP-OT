@@ -3,11 +3,8 @@
 #ifndef COLORUTIL_TYPE_HPP
 #define COLORUTIL_TYPE_HPP
 
-#ifdef __APPLE__
 #include <Eigen/Core>
-#else
-#include <eigen3/Eigen/Core>
-#endif
+
 namespace colorutil
 {
     /// \brief RGB
