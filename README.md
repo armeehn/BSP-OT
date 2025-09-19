@@ -1,6 +1,8 @@
 ## Official source code of the "BSP-OT: Sparse transport plans between discrete measures in loglinear time" paper (SIGGRAPH Asia 2025). 
 Baptiste Genest, Nicolas Bonneel, Vincent Nivoliers, David Coeurjolly.
 
+[![CMake on multiple platforms](https://github.com/baptiste-genest/BSP-OT/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/baptiste-genest/BSP-OT/actions/workflows/cmake-multi-platform.yml)
+
 ![teaser](https://github.com/baptiste-genest/BSP-OT/blob/main/teaser.jpg)
 
 # BSP-OT Compilation Guide
@@ -13,6 +15,7 @@ This guide explains how to compile the BSPOT project using CMake, focusing on th
 - **C++20** compatible compiler (e.g., GCC 10+, Clang 10+, MSVC 2019+)
 - **git** (for fetching some dependencies)
 - **Internet connection** (for fetching dependencies using CPM)
+- **Imagick** (only for color transfer, for image resizing and format conversion (not fetched))
 
 ### Dependencies
 
@@ -77,10 +80,6 @@ the --viz parameter allows to see the results with polyscope.
 
 ## Static parameters
 
-To optimize performances, the code has some static parameters:
-
--for bijective applications (bijections, barycenters, persistance_diagrams_matching,color_transfer) you can compile with floats to get a speed-up without changing the quality. The other applications must use doubles. this is set by the type *scalar* defined in common/types.h. Double by default.
-
-Each main file in apps is compiled with a static dimension, if you want to try 2D examples, please set "static_dim = 2".
+To optimize performances, the code has some static parameters. For bijective applications (bijections, barycenters, persistance_diagrams_matching, color_transfer) you can compile with floats to get a speed-up without changing the quality. The other applications must use doubles. this is set by the type *scalar* defined in common/types.h. Double by default. Each main file in apps is compiled with a static dimension, if you want to try 2D examples, please set "static_dim = 2".
 
 
