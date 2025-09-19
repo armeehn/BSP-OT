@@ -82,4 +82,32 @@ the --viz parameter allows to see the results with polyscope.
 
 To optimize performances, the code has some static parameters. For bijective applications (bijections, barycenters, persistance_diagrams_matching, color_transfer) you can compile with floats to get a speed-up without changing the quality. The other applications must use doubles. this is set by the type *scalar* defined in common/types.h. Double by default. Each main file in apps is compiled with a static dimension, if you want to try 2D examples, please set "static_dim = 2".
 
+## Header only
+
+If you want to easily import BSP-OT into your project, feel free to use the header only file 'BSP-OT_header_only.h'. It can then easily be used via something like:
+
+```cpp
+#include "BSP-OT_header_only.h"
+
+
+int main() {
+	using namespace BSPOT;
+	Points<2> A,B;
+	A = Points<2>::Random(2,1000);
+	B = Points<2>::Random(2,1000);
+
+
+	auto cost = [&] (int i,int j) {
+	return (A.col(i) - B.col(j)).squaredNorm();
+	};
+
+	auto T = computeGaussianBSPOT(A,B,10,cost);
+
+	std::cout << T.evalMatching(cost) << std::endl;
+
+
+	return 0;
+}
+
+```
 
