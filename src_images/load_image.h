@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../common/types.h"
 #include "../src/BSPOT.h"
 
 #include <fstream>

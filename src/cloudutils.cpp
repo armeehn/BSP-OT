@@ -1,11 +1,8 @@
 #include "cloudutils.h"
 #include <random>
 
-
-using namespace BSPOT;
-
-
-
+/*
+namespace BSPOT {
 
 void normalize(Vecs &X, Vec offset, scalar dilat){
     int dim = X[0].size();
@@ -67,9 +64,11 @@ void normalize(Mat &X, Vec offset, scalar dilat)
     X.rowwise() -= c.transpose();
     X *= f;
     X.rowwise() += offset.transpose();
-    /*
 
-    for (auto i : range(X.rows()))
-        X.row(i) = (X.row(i)-c).array()*f + offset.array();
-*/
+    // for (auto i : range(X.rows()))
+        // X.row(i) = (X.row(i)-c).array()*f + offset.array();
 }
+
+}
+
+*/

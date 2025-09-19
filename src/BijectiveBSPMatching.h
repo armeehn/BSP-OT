@@ -3,9 +3,8 @@
 
 #include "BSPOT.h"
 #include "spdlog/spdlog.h"
-#include "../common/sampling.h"
 #include "BijectiveMatching.h"
-#include "sampling.h"
+#include "../common/sampling.h"
 
 namespace BSPOT {
 

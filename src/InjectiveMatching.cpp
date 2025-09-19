@@ -1,5 +1,4 @@
 #include "InjectiveMatching.h"
-using namespace BSPOT;
 
 
 BSPOT::InjectiveMatching::InjectiveMatching(int m) : image_domain_size(m) {}
@@ -85,10 +84,10 @@ BSPOT::InjectiveMatching::InverseTransportPlan BSPOT::InjectiveMatching::getInve
     return rslt;
 }
 
-bool checkValid(const ints &T,const ints& TI) {
+bool checkValid(const BSPOT::ints &T,const BSPOT::ints& TI) {
     int M = TI.size();
     std::set<int> image;
-    for (auto i : range(T.size())) {
+    for (auto i : BSPOT::range(T.size())) {
         if (T[i] == -1)
             return false;
         image.insert(T[i]);
@@ -97,12 +96,12 @@ bool checkValid(const ints &T,const ints& TI) {
         spdlog::error("not injective");
         return false;
     }
-    for (auto i : range(T.size()))
+    for (auto i : BSPOT::range(T.size()))
         if (TI[T[i]] != i){
             spdlog::error("wrong inverse");
             return false;
         }
-    for (auto i : range(M)){
+    for (auto i : BSPOT::range(M)){
         if (TI[i] != -1 && !image.contains(i)){
             spdlog::error("wrong inverse");
             return false;
@@ -167,8 +166,8 @@ BSPOT::InjectiveMatching BSPOT::InjectiveMatching::Merge(const InjectiveMatching
     return InjectiveMatching(rslt,M);
 }
 
-Vec evalMappings(const BSPOT::InjectiveMatching& T,const BSPOT::cost_function& cost) {
-    Vec costs(T.size());
+BSPOT::Vec evalMappings(const BSPOT::InjectiveMatching& T,const BSPOT::cost_function& cost) {
+    BSPOT::Vec costs(T.size());
     for (int i = 0;i<T.size();i++)
         costs[i] = cost(i,T[i]);
 

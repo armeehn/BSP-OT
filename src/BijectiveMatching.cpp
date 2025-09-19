@@ -1,6 +1,6 @@
 #include "BijectiveMatching.h"
 
-using namespace BSPOT;
+namespace BSPOT {
 
 BijectiveMatching::BijectiveMatching(){}
 
@@ -88,7 +88,7 @@ std::vector<T> BijectiveMatching::operator()(const std::vector<T> &X) {
 }
 
 
-BijectiveMatching BSPOT::Merge(const BijectiveMatching &T, const BijectiveMatching &TP, const cost_function &cost, bool verbose) {
+BijectiveMatching Merge(const BijectiveMatching &T, const BijectiveMatching &TP, const cost_function &cost, bool verbose) {
     if (T.size() == 0)
         return TP;
     int N = T.size();
@@ -147,7 +147,7 @@ Vec evalMappings(const BijectiveMatching& T,const cost_function& cost) {
     return costs;
 }
 
-BijectiveMatching BSPOT::MergePlans(const std::vector<BijectiveMatching> &plans, const cost_function &cost, BijectiveMatching T,bool cycle) {
+BijectiveMatching MergePlans(const std::vector<BijectiveMatching> &plans, const cost_function &cost, BijectiveMatching T,bool cycle) {
     int s = 0;
     auto I = true ? rankPlans(plans,cost) : rangeVec(plans.size());
     if (T.size() == 0) {
@@ -268,7 +268,7 @@ BijectiveMatching BSPOT::MergePlans(const std::vector<BijectiveMatching> &plans,
     return rslt;
 }
 
-BijectiveMatching BSPOT::MergePlansNoPar(const std::vector<BijectiveMatching> &plans, const cost_function &cost, BijectiveMatching T,bool cycle) {
+BijectiveMatching MergePlansNoPar(const std::vector<BijectiveMatching> &plans, const cost_function &cost, BijectiveMatching T,bool cycle) {
     int s = 0;
     auto I = true ? rankPlans(plans,cost) : rangeVec(plans.size());
     if (T.size() == 0) {
@@ -369,7 +369,7 @@ BijectiveMatching BSPOT::MergePlansNoPar(const std::vector<BijectiveMatching> &p
     return rslt;
 }
 
-BijectiveMatching BSPOT::load_plan(std::string path) {
+BijectiveMatching load_plan(std::string path) {
     std::ifstream file(path);
     ints plan;
     while (file) {
@@ -395,7 +395,7 @@ inline std::vector<std::vector<T>> getPermutations(std::vector<T> C) {
 }
 
 
-bool BSPOT::swapIfUpgradeK(ints &plan, ints &inverse_plan, const ints &T, int a, int k, const cost_function &cost)
+bool swapIfUpgradeK(ints &plan, ints &inverse_plan, const ints &T, int a, int k, const cost_function &cost)
 {
     if (k == 2) {
         return BijectiveMatching::swapIfUpgrade(plan,inverse_plan,T,a,cost);
@@ -437,4 +437,6 @@ bool BSPOT::swapIfUpgradeK(ints &plan, ints &inverse_plan, const ints &T, int a,
         inverse_plan[best[i]] = Avec[i];
     }
     return true;
+}
+
 }

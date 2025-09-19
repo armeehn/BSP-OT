@@ -1,16 +1,15 @@
 #include "data_structures.h"
 
-using namespace BSPOT;
 
 
-UnionFind::UnionFind(int n) {
+BSPOT::UnionFind::UnionFind(int n) {
     parent.resize(n);
     rank.resize(n, 0);
     componentSize.resize(n, 1); // Initialize each component size to 1
     for (int i = 0; i < n; ++i) parent[i] = i;
 }
 
-int UnionFind::find(int u) {
+int BSPOT::UnionFind::find(int u) {
     if (parent[u] != u) {
         parent[u] = find(parent[u]); // Path compression
     }
@@ -33,7 +32,7 @@ int UnionFind::find(int u) {
 //}
 
 
-void UnionFind::unite(int x, int y) {
+void BSPOT::UnionFind::unite(int x, int y) {
     int rootX = find(x), rootY = find(y);
     if (rootX != rootY) {
         if (rank[rootX] > rank[rootY]) {
@@ -50,7 +49,7 @@ void UnionFind::unite(int x, int y) {
     }
 }
 
-std::vector<std::vector<int>> UnionFind::getConnectedComponents(int n) {
+std::vector<std::vector<int>> BSPOT::UnionFind::getConnectedComponents(int n) {
     std::unordered_map<int, int> rootIndex;  // Maps root -> index in components
     std::vector<std::vector<int>> components;
 
@@ -73,7 +72,7 @@ std::vector<std::vector<int>> UnionFind::getConnectedComponents(int n) {
     return components;
 }
 
-void StampedPriorityQueue::insert(int key, scalar priority) {
+void BSPOT::StampedPriorityQueue::insert(int key, scalar priority) {
     int ts = 0;
     if (timestamp.contains(key))
         ts = timestamp[key]+1;
@@ -81,7 +80,7 @@ void StampedPriorityQueue::insert(int key, scalar priority) {
     queue.push(stamped_element{priority, key, ts});
 }
 
-std::pair<int, scalar> StampedPriorityQueue::pop() {
+std::pair<int, BSPOT::scalar> BSPOT::StampedPriorityQueue::pop() {
     if (queue.empty())
         return {-1, 0};
     stamped_element e = queue.top();
@@ -95,6 +94,6 @@ std::pair<int, scalar> StampedPriorityQueue::pop() {
     return {e.id, e.priority};
 }
 
-bool StampedPriorityQueue::empty() const {
+bool BSPOT::StampedPriorityQueue::empty() const {
     return queue.empty();
 }

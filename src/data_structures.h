@@ -5,7 +5,7 @@
 #include <set>
 #include <unordered_map>
 
-#include "../common/types.h"
+#include "BSPOT.h"
 #include <iostream>
 
 namespace BSPOT {
