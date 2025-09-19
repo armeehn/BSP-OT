@@ -84,7 +84,7 @@ To optimize performances, the code has some static parameters. For bijective app
 
 ## Header only
 
-If you want to easily import BSP-OT into your project, feel free to use the header only file 'BSP-OT_header_only.h'. It can then easily be used via something like:
+If you want to easily import BSP-OT into your project, feel free to use the header only file `BSP-OT_header_only.h`. It can then easily be used via something like:
 
 ```cpp
 #include "BSP-OT_header_only.h"
