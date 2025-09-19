@@ -76,7 +76,8 @@ to reproduce the figure 8, you can execute
 ./bijections --mu_file ../data/point_clouds/armadillo.pts --nb_trees 64 --viz
 ```
 
-the --viz parameter allows to see the results with polyscope.
+the --viz parameter allows to see the results with polyscope. You should be able to do this:
+![example](https://github.com/baptiste-genest/BSP-OT/blob/main/armadillo_example.gif)
 
 ## Static parameters
 
@@ -101,13 +102,15 @@ int main() {
 	return (A.col(i) - B.col(j)).squaredNorm();
 	};
 
-	auto T = computeGaussianBSPOT(A,B,10,cost);
+	// source points, target points, number of trees to compute and merge, cost between points
+	auto T = computeGaussianBSPOT(A,B,64,cost);
 
-	std::cout << T.evalMatching(cost) << std::endl;
-
+	std::cout << "matching cost: " << T.evalMatching(cost) << std::endl;
+	for (auto i : range(A.cols())) {
+		std::cout << A.col(i).transpose() << " matched with " << B.col(T[i]).transpose() << std::endl;
+	}
 
 	return 0;
 }
-
 ```
 
