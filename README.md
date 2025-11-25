@@ -69,8 +69,12 @@ After compilation, the following programs will be built (if their sources are pr
 
 Each corresponds to a source file in the `apps/` directory.
 
-## Example
+## Examples
 
+Note that all parameters can be described with the help command on any the executable:
+```bash
+./any_exe --help
+```
 to reproduce the figure 8, you can execute
 ```bash
 ./bijections --mu_file ../data/point_clouds/armadillo.pts --nb_trees 64 --viz
@@ -78,6 +82,16 @@ to reproduce the figure 8, you can execute
 
 the --viz parameter allows to see the results with polyscope. You should be able to do this:
 ![example](https://github.com/baptiste-genest/BSP-OT/blob/main/armadillo_example.gif)
+
+For stippling 
+```bash
+./stippling --size_mu 10000 --nu_file ../data/images/fruits.png --res_grid 250 --output rslt.pts --viz
+```
+
+And color transfer
+```bash
+./color_transfer --target_image ../data/images/mountain.png --colors ../data/images/painting.jpg --iter 16 --output rslt.png
+```
 
 ## Static parameters
 
