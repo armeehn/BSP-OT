@@ -7,6 +7,8 @@
 
 #include "PartialBSPMatching.h"
 
+#include <omp.h>
+
 namespace BSPOT {
 
 /*
@@ -69,16 +71,23 @@ Coupling computeBSPOTCoupling(const Points<dim>& A,const Atoms& mu,const Points<
 template<int dim>
 Points<dim> computeBSPOTGradient(const Points<dim>& A,const Atoms& mu,const Points<dim>& B,const Atoms& nu,int nb_plans) {
     Points<dim> Grad = Points<dim>::Zero(A.rows(),A.cols());
-    int d = A.rows();
-#pragma omp parallel for
-    for (int i = 0;i<nb_plans;i++) {
-        GeneralBSPMatching BSP(A,mu,B,nu);
-        Points<dim> Grad_i = BSP.computeTransportGradient();
-        #pragma omp critical
-        {
-            Grad += Grad_i/nb_plans;
+    if (nb_plans <= 0)
+        return Grad;
+    const int max_threads = omp_get_max_threads();
+    std::vector<Points<dim>> accum(max_threads, Points<dim>::Zero(A.rows(),A.cols()));
+#pragma omp parallel
+    {
+        const int tid = omp_get_thread_num();
+#pragma omp for
+        for (int i = 0; i < nb_plans; i++) {
+            GeneralBSPMatching BSP(A,mu,B,nu);
+            Points<dim> Grad_i = BSP.computeTransportGradient();
+            accum[tid] += Grad_i;
         }
     }
+    for (auto& local : accum)
+        Grad += local;
+    Grad /= static_cast<scalar>(nb_plans);
     return Grad;
 }
 

@@ -3,7 +3,9 @@
 
 #include "BSPOT.h"
 #include "coupling.h"
+#include "cuda_backend.h"
 #include "sampling.h"
+#include "telemetry.h"
 #include <random>
 
 namespace BSPOT {
@@ -75,6 +77,7 @@ public:
 protected:
 
 
+    // Partition atoms by dot value to build a split for the mass CDF.
     CDFSplit partition(Atoms &atoms, int beg, int end, int idx) {
         scalar d = atoms[idx].dot;
         int idmin = beg;
@@ -141,8 +144,37 @@ protected:
     }
 
     void computeDots(Atoms &atoms, const Pts &X, int beg, int end, const Vector<D> &d) {
-        for (auto i : range(beg,end))
-            atoms[i].dot = X.col(atoms[i].id).dot(d) + i*1e-8;
+        const int count = end - beg;
+        if (count <= 0) return;
+        // Jitter avoids degenerate equal projections during partitioning.
+        constexpr scalar kDotJitter = static_cast<scalar>(1e-8);
+        telemetry::Recorder* rec = telemetry::current();
+
+        constexpr int kMinGpuPoints = 4096;
+        if (count >= kMinGpuPoints && cuda_backend::enabled()) {
+            thread_local std::vector<int> ids;
+            thread_local std::vector<scalar> dots;
+            ids.resize(static_cast<std::size_t>(count));
+            dots.resize(static_cast<std::size_t>(count));
+            for (int i = 0; i < count; ++i) {
+                ids[static_cast<std::size_t>(i)] = atoms[beg + i].id;
+            }
+            if (cuda_backend::projectDots(X.data(), dim, X.cols(), ids.data(), count, d.data(), dots.data(), rec)) {
+                for (int i = 0; i < count; ++i) {
+                    const int idx = beg + i;
+                    atoms[idx].dot = dots[static_cast<std::size_t>(i)] + kDotJitter * static_cast<scalar>(idx);
+                }
+                return;
+            }
+        }
+
+        const auto start = rec ? Time::now() : TimeStamp{};
+        for (auto i : range(beg, end)) {
+            atoms[i].dot = X.col(atoms[i].id).dot(d) + kDotJitter * static_cast<scalar>(i);
+        }
+        if (rec) {
+            rec->addCPUProjection(static_cast<std::size_t>(count), 1000.0 * TimeFrom(start));
+        }
     }
 
     CovType<D> slice_basis;
@@ -199,6 +231,7 @@ protected:
 
 
         if (gapA == 1) {
+            // Leaf case: all remaining mass on A is shipped to the B slice.
             for (auto i : range(begB,endB)) {
                 if (nu[i].mass < 1e-12)
                     continue;
@@ -209,6 +242,7 @@ protected:
             return;
         }
         if (gapB == 1) {
+            // Symmetric leaf case for a single B atom.
             for (auto i : range(begA,endA)) {
                 if (mu[i].mass < 1e-12)
                     continue;
@@ -257,6 +291,8 @@ protected:
             nu[i] = src_nu[i];
         Grad = Pts::Zero(dim,A.cols());
         triplets.clear();
+        // Heuristic reserve to reduce allocations when building the sparse plan.
+        triplets.reserve(static_cast<std::size_t>(src_mu.size() + src_nu.size()));
         coupling.setZero();
     }
 

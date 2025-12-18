@@ -2,8 +2,9 @@
 #define BIJECTIVEBSPMATCHING_H
 
 #include "BSPOT.h"
-#include "spdlog/spdlog.h"
 #include "BijectiveMatching.h"
+#include "cuda_backend.h"
+#include "spdlog/spdlog.h"
 #include "../common/sampling.h"
 
 namespace BSPOT {
@@ -62,11 +63,51 @@ protected:
     }
 
     void BSP(ids& idA,ids& idB,int beg,int end,int pivot,const Vector<D>& d) {
+        const int count = end - beg;
+        telemetry::Recorder* rec = telemetry::current();
+        bool doneA = false;
+        bool doneB = false;
 
-        for (auto i : range(beg,end)) {
-            idA[i].dot = d.dot(A.col(idA[i].id));// + sampleUnitGaussian<1>()(0)*0e-3;
-            idB[i].dot = d.dot(B.col(idB[i].id));// + sampleUnitGaussian<1>()(0)*0e-3;
+        constexpr int kMinGpuPoints = 4096;
+        if (count >= kMinGpuPoints && cuda_backend::enabled()) {
+            thread_local std::vector<int> idsA;
+            thread_local std::vector<int> idsB;
+            thread_local std::vector<scalar> dots;
+            idsA.resize(static_cast<std::size_t>(count));
+            idsB.resize(static_cast<std::size_t>(count));
+            dots.resize(static_cast<std::size_t>(count));
+            for (int i = 0; i < count; ++i) {
+                idsA[static_cast<std::size_t>(i)] = idA[beg + i].id;
+                idsB[static_cast<std::size_t>(i)] = idB[beg + i].id;
+            }
+            if (cuda_backend::projectDots(A.data(), dim, A.cols(), idsA.data(), count, d.data(), dots.data(), rec)) {
+                for (int i = 0; i < count; ++i) {
+                    idA[beg + i].dot = dots[static_cast<std::size_t>(i)];
+                }
+                doneA = true;
+            }
+            if (cuda_backend::projectDots(B.data(), dim, B.cols(), idsB.data(), count, d.data(), dots.data(), rec)) {
+                for (int i = 0; i < count; ++i) {
+                    idB[beg + i].dot = dots[static_cast<std::size_t>(i)];
+                }
+                doneB = true;
+            }
         }
+
+        if (!doneA || !doneB) {
+            const auto start = rec ? Time::now() : TimeStamp{};
+            for (auto i : range(beg,end)) {
+                if (!doneA)
+                    idA[i].dot = d.dot(A.col(idA[i].id));
+                if (!doneB)
+                    idB[i].dot = d.dot(B.col(idB[i].id));
+            }
+            if (rec) {
+                const std::size_t points = static_cast<std::size_t>(count) * ((doneA ? 0 : 1) + (doneB ? 0 : 1));
+                rec->addCPUProjection(points, 1000.0 * TimeFrom(start));
+            }
+        }
+
         std::nth_element(idA.begin() + beg,idA.begin() + pivot,idA.begin() + end);
         std::nth_element(idB.begin() + beg,idB.begin() + pivot,idB.begin() + end);
     }
