@@ -3,3 +3,7 @@ CMakeLists.txt.user
 *.o
 
 build/*
+build*/
+
+benchmarks/out*/
+metrics_bijection_*.json
