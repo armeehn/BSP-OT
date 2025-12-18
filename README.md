@@ -32,6 +32,17 @@ The following libraries are required and are automatically handled by the CMake 
 
 All dependencies except Eigen3 are also included via CMake include scripts (see the `cmake/` directory).
 
+### Optional CUDA acceleration
+
+- **CUDA Toolkit** (for GPU projection acceleration)
+- Enable with `-DBSPOT_ENABLE_CUDA=ON`
+- Provide an architecture via `-DCMAKE_CUDA_ARCHITECTURES=75` (adjust for your GPU)
+- Set `BSPOT_DISABLE_CUDA=1` to force CPU at runtime
+
+### Optional geometry-central
+
+If you do not need mesh-based apps, configure with `-DBSPOT_USE_GEOMETRY_CENTRAL=OFF`.
+
 ## Step-by-Step Compilation
 
 1. **Go in code folder**
@@ -68,6 +79,7 @@ After compilation, the following programs will be built (if their sources are pr
 - `color_transfer`
 - `stippling`
 - `scale_rigid_registration`
+- `viz_playground`
 
 Each corresponds to a source file in the `apps/` directory.
 
@@ -93,6 +105,11 @@ For stippling
 And color transfer
 ```bash
 ./color_transfer --target_image ../data/images/mountain.png --colors ../data/images/painting.jpg --iter 16 --output rslt.png
+```
+
+Playground with GPU/CPU metrics:
+```bash
+./viz_playground --mode bijection --viz --dashboard
 ```
 
 ## Static parameters
