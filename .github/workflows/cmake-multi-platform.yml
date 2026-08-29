@@ -10,7 +10,9 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ contains(github.server_url, 'github.com') && matrix.os || 'ubuntu-latest' }}
+    # Gitea: no macOS runner on Gitea; the macos-latest leg would queue forever.
+    if: ${{ matrix.os == 'ubuntu-latest' || contains(github.server_url, 'github.com') }}
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
