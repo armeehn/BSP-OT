@@ -10,7 +10,12 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    # A job-level `if:` is evaluated by whichever runner picks the job up, so a
+    # job whose `runs-on` label no runner advertises is never evaluated -- it
+    # queues forever. Redirecting `runs-on` to a label that does exist makes the
+    # guard below reachable, and the macOS leg is then cleanly skipped on Gitea.
+    runs-on: ${{ contains(github.server_url, 'github.com') && matrix.os || 'ubuntu-latest' }}
+    if: ${{ matrix.os == 'ubuntu-latest' || contains(github.server_url, 'github.com') }}
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
@@ -40,7 +45,12 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
            sudo apt-get update
-           sudo apt-get install xorg-dev libglu1-mesa-dev libboost-dev freeglut3-dev mesa-common-dev 
+           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+             xorg-dev libglu1-mesa-dev libboost-dev freeglut3-dev mesa-common-dev
+           # geometry-central sets policy CMP0169, which needs CMake >= 3.30.
+           # Ubuntu 24.04's apt has 3.28.3, so pin CMake rather than trust
+           # whatever the runner image happens to ship.
+           sudo PIP_BREAK_SYSTEM_PACKAGES=1 python3 -m pip install "cmake>=3.30"
 
     - name: Deps (macos)
       if: matrix.os == 'macos-latest'
